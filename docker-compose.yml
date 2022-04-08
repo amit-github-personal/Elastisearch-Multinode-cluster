@@ -1,0 +1,111 @@
+version: '2.2'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02,es03, es04
+      - cluster.initial_master_nodes=es01,es02,es03, es04
+      - bootstrap.memory_lock=true
+      - node.max_local_storage_nodes=4
+      - node.master=true
+      - node.voting_only=false
+      - node.remote_cluster_client=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03, es04
+      - cluster.initial_master_nodes=es01,es02,es03, es04
+      - bootstrap.memory_lock=true
+      - node.max_local_storage_nodes=4
+      - node.master=true
+      - node.voting_only=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02, es04
+      - cluster.initial_master_nodes=es01,es02,es03, es04
+      - bootstrap.memory_lock=true
+      - node.max_local_storage_nodes=4
+      - node.master=true
+      - node.voting_only=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+  es04:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: es04
+    environment:
+      - node.name=es04
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03, es04
+      - bootstrap.memory_lock=true
+      - node.max_local_storage_nodes=4
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+
+
+volumes:
+  data01:
+    driver: local
+    name: data01
+  data02:
+    driver: local
+    name: data02
+  data03:
+    driver: local
+    name: data03
+  data04:
+    driver: local
+    name: data04
+
+
+networks:
+  elastic:
+    driver: bridge
+    name: elastic
